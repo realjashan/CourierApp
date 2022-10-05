@@ -1,20 +1,43 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import StackNavigation from "./src/Navigation/Stack";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Amplify } from "aws-amplify";
+import awsconfig from "./src/aws-exports";
+import {withAuthenticator} from 'aws-amplify-react-native'
+import  AuthContextProvider, { useAuthContext } from './src/context/AuthContext'
+import OrderContextProvider from "./src/context/OrderContext";
 
-export default function App() {
+
+
+
+
+
+Amplify.configure({
+  ...awsconfig,
+  Analytics: {
+    disabled: true,
+  },
+});
+
+ function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+    <NavigationContainer>
+      {/* gesture handler to make bottom sheet work in android */}
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AuthContextProvider>
+          <OrderContextProvider>
+        <StackNavigation />
+        </OrderContextProvider>
+
+        </AuthContextProvider>
+      </GestureHandlerRootView>
+
       <StatusBar style="auto" />
-    </View>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default withAuthenticator(App);
+
